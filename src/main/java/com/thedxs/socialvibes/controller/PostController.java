@@ -1,6 +1,7 @@
 package com.thedxs.socialvibes.controller;
 
-import com.thedxs.socialvibes.dto.PostDto;
+import com.thedxs.socialvibes.dto.PostRequest;
+import com.thedxs.socialvibes.dto.PostResponse;
 import com.thedxs.socialvibes.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,20 +18,27 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping
-    public ResponseEntity<List<PostDto>> retrieveAllPosts() {
-        List<PostDto> list = postService.getAllPosts();
+    public ResponseEntity<List<PostResponse>> retrieveAllPosts() {
+        List<PostResponse> list = postService.getAllPosts();
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostDto> retrievePost(@PathVariable Long id) {
-        PostDto postDto = postService.getPost(id);
-        return ResponseEntity.ok(postDto);
+    public ResponseEntity<PostResponse> retrievePost(@PathVariable Long id) {
+        PostResponse postResponse = postService.getPost(id);
+        return ResponseEntity.ok(postResponse);
     }
 
     @PostMapping
-    public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto) {
-        PostDto newPost = postService.addPost(postDto);
+    public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest request) {
+        PostResponse newPost = postService.addPost(request);
         return new ResponseEntity<>(newPost, HttpStatus.CREATED);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PostResponse> updatePost(@PathVariable Long id, @RequestBody PostRequest request) {
+        PostResponse updatedPost = postService.updatePost(id,request);
+        return ResponseEntity.ok(updatedPost);
+    }
+
 }
