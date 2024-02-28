@@ -1,9 +1,10 @@
 package com.thedxs.socialvibes.service;
 
 import com.thedxs.socialvibes.dto.PostDtoConverter;
+import com.thedxs.socialvibes.dto.PostRequest;
 import com.thedxs.socialvibes.model.Post;
 import com.thedxs.socialvibes.repository.PostRepository;
-import com.thedxs.socialvibes.dto.PostDto;
+import com.thedxs.socialvibes.dto.PostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,23 +18,30 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostDtoConverter dtoConverter;
 
-    public List<PostDto> getAllPosts() {
+    public List<PostResponse> getAllPosts() {
         List<Post> posts = postRepository.findAll();
         return posts.stream().map(dtoConverter::convertToPostDto)
                 .collect(Collectors.toList());
     }
 
-
-    public PostDto getPost(Long id) {
+    public PostResponse getPost(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post Not Found"));
         return dtoConverter.convertToPostDto(post);
     }
 
-
-    public PostDto addPost(PostDto postDto) {
-        Post post = dtoConverter.convertToPost(postDto);
+    public PostResponse addPost(PostRequest postRequest) {
+        Post post = dtoConverter.convertToPost(postRequest);
         Post dbPost = postRepository.save(post);
         return dtoConverter.convertToPostDto(dbPost);
+    }
+
+    public PostResponse updatePost(Long id, PostRequest request) {
+        Post existingPost = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found witd id: " + id));
+        existingPost.setTitle(request.getTitle());
+        existingPost.setContent(request.getContent());
+        Post updatedPost = postRepository.save(existingPost);
+        return dtoConverter.convertToPostDto(updatedPost);
     }
 }

@@ -13,17 +13,21 @@ public class PostDtoConverter {
     private final ModelMapper modelMapper;
     private final UserRepository repository;
 
-
-    public PostDto convertToPostDto(Post post) {
-        PostDto postDto = modelMapper.map(post, PostDto.class);
-        postDto.setUserId(post.getUser().getId());
-        return postDto;
+    public Post convertToPost(PostRequest request) {
+        return Post.builder()
+                .content(request.getContent())
+                .title(request.getTitle())
+                .user(repository.findById(request.getUserId()).orElseThrow())
+                .build();
     }
 
-    public Post convertToPost(PostDto postDto) {
-        Post post = modelMapper.map(postDto, Post.class);
-        post.setUser(repository.findById(postDto.getUserId()).orElseThrow());
-        return post;
+    public PostResponse convertToPostDto(Post post) {
+        return PostResponse.builder()
+                .id(post.getId())
+                .content(post.getContent())
+                .title(post.getTitle())
+                .userId(post.getUser().getId())
+                .build();
     }
 
 }
